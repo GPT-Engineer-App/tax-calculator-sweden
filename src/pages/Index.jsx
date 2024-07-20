@@ -4,6 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 const formatNumber = (number) => {
   return Math.round(number).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
@@ -16,31 +18,37 @@ const taxRates = [
 ];
 
 const Index = () => {
-  const [monthlySalary, setMonthlySalary] = useState(30000);
+  const [salary, setSalary] = useState(30000);
   const [netSalary, setNetSalary] = useState(null);
   const [taxPercentage, setTaxPercentage] = useState(null);
   const [employerCost, setEmployerCost] = useState(null);
+  const [isYearly, setIsYearly] = useState(false);
 
   const handleSliderChange = (value) => {
-    setMonthlySalary(value[0]);
+    setSalary(value[0]);
   };
 
   const handleCalculate = () => {
-    const salary = monthlySalary;
-    if (isNaN(salary)) return;
+    const monthlySalary = isYearly ? salary / 12 : salary;
+    if (isNaN(monthlySalary)) return;
 
-    const calculatedNetSalary = salary * 0.7; // Assuming 30% tax for now
+    const calculatedNetSalary = monthlySalary * 0.7; // Assuming 30% tax for now
     const calculatedTaxPercentage = 30;
-    const calculatedEmployerCost = salary * 1.3; // Assuming 30% additional cost for employer
+    const calculatedEmployerCost = monthlySalary * 1.3; // Assuming 30% additional cost for employer
 
-    setNetSalary(calculatedNetSalary);
+    setNetSalary(isYearly ? calculatedNetSalary * 12 : calculatedNetSalary);
     setTaxPercentage(calculatedTaxPercentage);
-    setEmployerCost(calculatedEmployerCost);
+    setEmployerCost(isYearly ? calculatedEmployerCost * 12 : calculatedEmployerCost);
   };
 
   useEffect(() => {
     handleCalculate();
-  }, [monthlySalary]);
+  }, [salary, isYearly]);
+
+  const togglePeriod = () => {
+    setIsYearly(!isYearly);
+    setSalary(isYearly ? salary / 12 : salary * 12);
+  };
 
   return (
     <div className="container mx-auto p-4">
@@ -49,20 +57,26 @@ const Index = () => {
         <div className="md:col-span-2">
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle>Enter Your Monthly Salary</CardTitle>
+              <CardTitle>Enter Your {isYearly ? "Yearly" : "Monthly"} Salary</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Switch id="period-toggle" checked={isYearly} onCheckedChange={togglePeriod} />
+                  <Label htmlFor="period-toggle">
+                    {isYearly ? "Yearly" : "Monthly"}
+                  </Label>
+                </div>
                 <Slider
-                  value={[monthlySalary]}
+                  value={[salary]}
                   onValueChange={handleSliderChange}
-                  max={100000}
-                  step={1000}
+                  max={isYearly ? 1200000 : 100000}
+                  step={isYearly ? 12000 : 1000}
                   className="mb-4"
                 />
                 <Input
                   type="text"
-                  value={formatNumber(monthlySalary)}
+                  value={formatNumber(salary)}
                   readOnly
                   className="text-right"
                 />
@@ -74,7 +88,7 @@ const Index = () => {
           {netSalary !== null && (
             <Card>
               <CardHeader>
-                <CardTitle>Calculation Results</CardTitle>
+                <CardTitle>Calculation Results ({isYearly ? "Yearly" : "Monthly"})</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
@@ -89,7 +103,7 @@ const Index = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Swedish Tax Rates</CardTitle>
+            <CardTitle>Swedish Tax Rates (Yearly)</CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
