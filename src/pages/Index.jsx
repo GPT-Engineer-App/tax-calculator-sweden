@@ -32,14 +32,17 @@ const calculateTax = (salary, isYearly) => {
   }
   tax += remainingSalary * 0.32;
 
-  const socialSecurity = yearlySalary * 0.3142; // 31.42% of gross salary
-  const pensionContribution = Math.min(yearlySalary * 0.07, 39700); // 7% of gross salary, max 39,700 SEK
+  // Employer's social security contribution (31.42% of gross salary)
+  const socialSecurity = yearlySalary * 0.3142;
+
+  // Employee's pension contribution (7% of gross salary, max 39,700 SEK per year)
+  const pensionContribution = Math.min(yearlySalary * 0.07, 39700);
 
   return {
     incomeTax: tax,
     socialSecurity,
     pensionContribution,
-    totalTax: tax + socialSecurity + pensionContribution,
+    totalTax: tax + pensionContribution, // Only income tax and pension contribution affect net salary
   };
 };
 
@@ -141,10 +144,6 @@ const Index = () => {
                       <TableCell className="text-right">-{formatNumber(isYearly ? taxBreakdown.incomeTax : taxBreakdown.incomeTax / 12)} SEK</TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell>Social Security</TableCell>
-                      <TableCell className="text-right">-{formatNumber(isYearly ? taxBreakdown.socialSecurity : taxBreakdown.socialSecurity / 12)} SEK</TableCell>
-                    </TableRow>
-                    <TableRow>
                       <TableCell>Pension Contribution</TableCell>
                       <TableCell className="text-right">-{formatNumber(isYearly ? taxBreakdown.pensionContribution : taxBreakdown.pensionContribution / 12)} SEK</TableCell>
                     </TableRow>
@@ -155,6 +154,10 @@ const Index = () => {
                     <TableRow>
                       <TableCell>Tax Percentage</TableCell>
                       <TableCell className="text-right">{taxBreakdown.taxPercentage.toFixed(2)}%</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Employer's Social Security Contribution</TableCell>
+                      <TableCell className="text-right">{formatNumber(isYearly ? taxBreakdown.socialSecurity : taxBreakdown.socialSecurity / 12)} SEK</TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell>Total Employer Cost</TableCell>
@@ -208,10 +211,6 @@ const Index = () => {
                       <TableCell className="text-right">-{formatNumber(isYearly ? comparisonTaxBreakdown.incomeTax : comparisonTaxBreakdown.incomeTax / 12)} SEK</TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell>Social Security</TableCell>
-                      <TableCell className="text-right">-{formatNumber(isYearly ? comparisonTaxBreakdown.socialSecurity : comparisonTaxBreakdown.socialSecurity / 12)} SEK</TableCell>
-                    </TableRow>
-                    <TableRow>
                       <TableCell>Pension Contribution</TableCell>
                       <TableCell className="text-right">-{formatNumber(isYearly ? comparisonTaxBreakdown.pensionContribution : comparisonTaxBreakdown.pensionContribution / 12)} SEK</TableCell>
                     </TableRow>
@@ -222,6 +221,10 @@ const Index = () => {
                     <TableRow>
                       <TableCell>Tax Percentage</TableCell>
                       <TableCell className="text-right">{comparisonTaxBreakdown.taxPercentage.toFixed(2)}%</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Employer's Social Security Contribution</TableCell>
+                      <TableCell className="text-right">{formatNumber(isYearly ? comparisonTaxBreakdown.socialSecurity : comparisonTaxBreakdown.socialSecurity / 12)} SEK</TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell>Total Employer Cost</TableCell>
