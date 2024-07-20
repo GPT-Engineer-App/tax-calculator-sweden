@@ -30,32 +30,6 @@ const SOCIAL_SECURITY_PERCENTAGE = 31.42;
 const DIVIDEND_TAX_RATE = 0.30;
 const CAPITAL_GAINS_TAX_RATE = 0.30;
 
-const calculateTax = (salary, isYearly) => {
-  const yearlySalary = isYearly ? salary : salary * 12;
-  let tax = 0;
-  let remainingSalary = yearlySalary;
-
-  if (remainingSalary > 709300) {
-    tax += (remainingSalary - 709300) * 0.57;
-    remainingSalary = 709300;
-  }
-  if (remainingSalary > 540700) {
-    tax += (remainingSalary - 540700) * 0.52;
-    remainingSalary = 540700;
-  }
-  tax += remainingSalary * 0.32;
-
-  const socialSecurity = yearlySalary * (SOCIAL_SECURITY_PERCENTAGE / 100);
-  const pensionContribution = Math.min(yearlySalary * 0.07, 39700);
-
-  return {
-    incomeTax: tax,
-    socialSecurity,
-    pensionContribution,
-    totalTax: tax + pensionContribution,
-  };
-};
-
 const stockholmTaxTable = [
   { grossSalary: 10000, withholding: 1363, percentage: 13.63, netSalary: 8637, socialTax: 3142, totalCost: 13142 },
   { grossSalary: 15000, withholding: 2653, percentage: 17.69, netSalary: 12347, socialTax: 4713, totalCost: 19713 },
@@ -87,6 +61,32 @@ const stockholmTaxTable = [
   { grossSalary: 145000, withholding: 70247, percentage: 48.45, netSalary: 74753, socialTax: 45559, totalCost: 190559 },
   { grossSalary: 150000, withholding: 73147, percentage: 48.76, netSalary: 76853, socialTax: 47130, totalCost: 197130 },
 ];
+
+const calculateTaxFromTable = (salary, isYearly) => {
+  const monthlySalary = isYearly ? salary / 12 : salary;
+  
+  // Find the closest salary in the table
+  const closestSalary = stockholmTaxTable.reduce((prev, curr) => {
+    return (Math.abs(curr.grossSalary - monthlySalary) < Math.abs(prev.grossSalary - monthlySalary) ? curr : prev);
+  });
+
+  // Calculate the tax based on the percentage from the table
+  const taxPercentage = closestSalary.percentage / 100;
+  const monthlyTax = monthlySalary * taxPercentage;
+  const monthlyNetSalary = monthlySalary - monthlyTax;
+  const monthlySocialTax = closestSalary.socialTax * (monthlySalary / closestSalary.grossSalary);
+  const monthlyTotalCost = monthlySalary + monthlySocialTax;
+
+  // Convert to yearly if needed
+  const factor = isYearly ? 12 : 1;
+  return {
+    incomeTax: monthlyTax * factor,
+    netSalary: monthlyNetSalary * factor,
+    socialSecurity: monthlySocialTax * factor,
+    employerCost: monthlyTotalCost * factor,
+    taxPercentage: taxPercentage * 100
+  };
+};
 
 const Index = () => {
   const { t, i18n } = useTranslation();
@@ -137,23 +137,21 @@ const Index = () => {
   };
 
   const calculateBreakdown = (currentSalary, setBreakdownState) => {
-    const taxResult = calculateTax(currentSalary, isYearly);
+    const taxResult = calculateTaxFromTable(currentSalary, isYearly);
     const grossSalary = isYearly ? currentSalary : currentSalary * 12;
-    const netSalary = grossSalary - taxResult.totalTax;
-    const taxPercentage = (taxResult.totalTax / grossSalary) * 100;
-    const employerCost = grossSalary + taxResult.socialSecurity;
 
     const dividendTax = dividends * DIVIDEND_TAX_RATE;
     const capitalGainsTax = capitalGains * CAPITAL_GAINS_TAX_RATE;
 
     setBreakdownState({
       grossSalary,
-      netSalary,
-      taxPercentage,
-      employerCost,
+      netSalary: taxResult.netSalary,
+      taxPercentage: taxResult.taxPercentage,
+      employerCost: taxResult.employerCost,
       dividendTax,
       capitalGainsTax,
-      ...taxResult,
+      incomeTax: taxResult.incomeTax,
+      socialSecurity: taxResult.socialSecurity,
     });
   };
 
@@ -189,10 +187,6 @@ const Index = () => {
                 <TableRow>
                   <TableCell>{t('incomeTax')}</TableCell>
                   <TableCell className="text-right">-{formatNumber(isYearly ? breakdown.incomeTax : breakdown.incomeTax / 12)} SEK</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>{t('pensionContribution')}</TableCell>
-                  <TableCell className="text-right">-{formatNumber(isYearly ? breakdown.pensionContribution : breakdown.pensionContribution / 12)} SEK</TableCell>
                 </TableRow>
               </>
             )}
