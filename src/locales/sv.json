@@ -24,5 +24,6 @@
   "taxRate": "Skattesats",
   "yearly": "Årlig",
   "monthly": "Månatlig",
-  "language": "Språk"
+  "language": "Språk",
+  "stockholmTaxGraph": "Stockholms Skattegraf"
 }
