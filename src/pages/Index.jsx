@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const formatNumber = (number) => {
   return Math.round(number).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
@@ -53,6 +54,20 @@ const calculateTax = (salary, isYearly) => {
     totalTax: tax + pensionContribution,
   };
 };
+
+const stockholmTaxTable = [
+  { grossSalary: 10000, withholding: 1363, percentage: 13.63, netSalary: 8637, socialTax: 3142, totalCost: 13142 },
+  { grossSalary: 15000, withholding: 2653, percentage: 17.69, netSalary: 12347, socialTax: 4713, totalCost: 19713 },
+  { grossSalary: 20000, withholding: 3999, percentage: 20.00, netSalary: 16001, socialTax: 6284, totalCost: 26284 },
+  { grossSalary: 25000, withholding: 5345, percentage: 21.38, netSalary: 19655, socialTax: 7855, totalCost: 32855 },
+  { grossSalary: 30000, withholding: 6695, percentage: 22.32, netSalary: 23305, socialTax: 9426, totalCost: 39426 },
+  { grossSalary: 35000, withholding: 8195, percentage: 23.41, netSalary: 26805, socialTax: 10997, totalCost: 45997 },
+  { grossSalary: 40000, withholding: 10309, percentage: 25.77, netSalary: 29691, socialTax: 12568, totalCost: 52568 },
+  { grossSalary: 45000, withholding: 12809, percentage: 28.46, netSalary: 32191, socialTax: 14139, totalCost: 59139 },
+  { grossSalary: 50000, withholding: 15309, percentage: 30.62, netSalary: 34691, socialTax: 15710, totalCost: 65710 },
+  { grossSalary: 55000, withholding: 18047, percentage: 32.81, netSalary: 36953, socialTax: 17281, totalCost: 72281 },
+  { grossSalary: 60000, withholding: 20947, percentage: 34.91, netSalary: 39053, socialTax: 18852, totalCost: 78852 },
+];
 
 const Index = () => {
   const { t, i18n } = useTranslation();
@@ -360,6 +375,40 @@ const Index = () => {
           </CardContent>
         </Card>
       )}
+
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle>{t('title')} - {t('swedishTaxRates', { period: t('monthly') })}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ScrollArea className="h-[400px]">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t('grossSalary')} (SEK)</TableHead>
+                  <TableHead>{t('incomeTax')}</TableHead>
+                  <TableHead>{t('taxPercentage')}</TableHead>
+                  <TableHead>{t('netSalary')} (SEK)</TableHead>
+                  <TableHead>{t('employerSocialSecurity')} (SEK)</TableHead>
+                  <TableHead>{t('totalEmployerCost')} (SEK)</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {stockholmTaxTable.map((row, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{formatNumber(row.grossSalary)}</TableCell>
+                    <TableCell>{formatNumber(row.withholding)}</TableCell>
+                    <TableCell>{row.percentage.toFixed(2)}%</TableCell>
+                    <TableCell>{formatNumber(row.netSalary)}</TableCell>
+                    <TableCell>{formatNumber(row.socialTax)}</TableCell>
+                    <TableCell>{formatNumber(row.totalCost)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </ScrollArea>
+        </CardContent>
+      </Card>
     </div>
   );
 };
