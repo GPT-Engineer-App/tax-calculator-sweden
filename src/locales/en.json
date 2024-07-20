@@ -1,0 +1,21 @@
+{
+  "title": "Swedish Tax Calculator",
+  "enterSalary": "Enter Your {{period}} Salary",
+  "comparisonSalary": "Comparison Salary ({{period}})",
+  "taxBreakdown": "Tax Breakdown",
+  "comparisonTaxBreakdown": "Comparison Tax Breakdown",
+  "swedishTaxRates": "Swedish Tax Rates ({{period}})",
+  "grossSalary": "Gross Salary",
+  "incomeTax": "Income Tax",
+  "pensionContribution": "Pension Contribution",
+  "netSalary": "Net Salary",
+  "taxPercentage": "Tax Percentage",
+  "employerSocialSecurity": "Employer's Social Security Contribution",
+  "socialSecurityPercentage": "Social Security Percentage",
+  "totalEmployerCost": "Total Employer Cost",
+  "income": "Income (SEK)",
+  "taxRate": "Tax Rate",
+  "yearly": "Yearly",
+  "monthly": "Monthly",
+  "language": "Language"
+}

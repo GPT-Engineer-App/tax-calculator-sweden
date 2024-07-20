@@ -1,0 +1,21 @@
+{
+  "title": "Svensk Skatteberäknare",
+  "enterSalary": "Ange din {{period}} lön",
+  "comparisonSalary": "Jämförelselön ({{period}})",
+  "taxBreakdown": "Skattefördelning",
+  "comparisonTaxBreakdown": "Jämförande skattefördelning",
+  "swedishTaxRates": "Svenska skattesatser ({{period}})",
+  "grossSalary": "Bruttolön",
+  "incomeTax": "Inkomstskatt",
+  "pensionContribution": "Pensionsavgift",
+  "netSalary": "Nettolön",
+  "taxPercentage": "Skatteprocent",
+  "employerSocialSecurity": "Arbetsgivaravgift",
+  "socialSecurityPercentage": "Procentsats för sociala avgifter",
+  "totalEmployerCost": "Total arbetsgivarkostnad",
+  "income": "Inkomst (SEK)",
+  "taxRate": "Skattesats",
+  "yearly": "Årlig",
+  "monthly": "Månatlig",
+  "language": "Språk"
+}

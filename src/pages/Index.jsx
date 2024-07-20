@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,6 +7,7 @@ import { Slider } from "@/components/ui/slider";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const formatNumber = (number) => {
   return Math.round(number).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
@@ -34,21 +36,19 @@ const calculateTax = (salary, isYearly) => {
   }
   tax += remainingSalary * 0.32;
 
-  // Employer's social security contribution (31.42% of gross salary)
   const socialSecurity = yearlySalary * (SOCIAL_SECURITY_PERCENTAGE / 100);
-
-  // Employee's pension contribution (7% of gross salary, max 39,700 SEK per year)
   const pensionContribution = Math.min(yearlySalary * 0.07, 39700);
 
   return {
     incomeTax: tax,
     socialSecurity,
     pensionContribution,
-    totalTax: tax + pensionContribution, // Only income tax and pension contribution affect net salary
+    totalTax: tax + pensionContribution,
   };
 };
 
 const Index = () => {
+  const { t, i18n } = useTranslation();
   const [salary, setSalary] = useState(30000);
   const [comparisonSalary, setComparisonSalary] = useState(40000);
   const [taxBreakdown, setTaxBreakdown] = useState(null);
@@ -98,41 +98,41 @@ const Index = () => {
   const renderTaxBreakdown = (breakdown, title) => (
     <Card>
       <CardHeader>
-        <CardTitle>{title} ({isYearly ? "Yearly" : "Monthly"})</CardTitle>
+        <CardTitle>{t(title)} ({isYearly ? t('yearly') : t('monthly')})</CardTitle>
       </CardHeader>
       <CardContent>
         <Table>
           <TableBody>
             <TableRow>
-              <TableCell>Gross Salary</TableCell>
+              <TableCell>{t('grossSalary')}</TableCell>
               <TableCell className="text-right">{formatNumber(isYearly ? breakdown.grossSalary : breakdown.grossSalary / 12)} SEK</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>Income Tax</TableCell>
+              <TableCell>{t('incomeTax')}</TableCell>
               <TableCell className="text-right">-{formatNumber(isYearly ? breakdown.incomeTax : breakdown.incomeTax / 12)} SEK</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>Pension Contribution</TableCell>
+              <TableCell>{t('pensionContribution')}</TableCell>
               <TableCell className="text-right">-{formatNumber(isYearly ? breakdown.pensionContribution : breakdown.pensionContribution / 12)} SEK</TableCell>
             </TableRow>
             <TableRow className="font-bold">
-              <TableCell>Net Salary</TableCell>
+              <TableCell>{t('netSalary')}</TableCell>
               <TableCell className="text-right">{formatNumber(isYearly ? breakdown.netSalary : breakdown.netSalary / 12)} SEK</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>Tax Percentage</TableCell>
+              <TableCell>{t('taxPercentage')}</TableCell>
               <TableCell className="text-right">{breakdown.taxPercentage.toFixed(2)}%</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>Employer's Social Security Contribution</TableCell>
+              <TableCell>{t('employerSocialSecurity')}</TableCell>
               <TableCell className="text-right">{formatNumber(isYearly ? breakdown.socialSecurity : breakdown.socialSecurity / 12)} SEK</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>Social Security Percentage</TableCell>
+              <TableCell>{t('socialSecurityPercentage')}</TableCell>
               <TableCell className="text-right">{SOCIAL_SECURITY_PERCENTAGE.toFixed(2)}%</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>Total Employer Cost</TableCell>
+              <TableCell>{t('totalEmployerCost')}</TableCell>
               <TableCell className="text-right">{formatNumber(isYearly ? breakdown.employerCost : breakdown.employerCost / 12)} SEK</TableCell>
             </TableRow>
           </TableBody>
@@ -143,16 +143,30 @@ const Index = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold text-center mb-6">Swedish Tax Calculator</h1>
+      <h1 className="text-3xl font-bold text-center mb-6">{t('title')}</h1>
+      <div className="flex justify-end mb-4">
+        <Select
+          value={i18n.language}
+          onValueChange={(value) => i18n.changeLanguage(value)}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder={t('language')} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="en">English</SelectItem>
+            <SelectItem value="sv">Svenska</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="flex justify-between items-center">
-              <span>Enter Your {isYearly ? "Yearly" : "Monthly"} Salary</span>
+              <span>{t('enterSalary', { period: isYearly ? t('yearly') : t('monthly') })}</span>
               <div className="flex items-center space-x-2">
                 <Switch id="period-toggle" checked={isYearly} onCheckedChange={togglePeriod} />
                 <Label htmlFor="period-toggle" className="text-sm">
-                  {isYearly ? "Yearly" : "Monthly"}
+                  {isYearly ? t('yearly') : t('monthly')}
                 </Label>
               </div>
             </CardTitle>
@@ -178,7 +192,7 @@ const Index = () => {
 
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Comparison Salary ({isYearly ? "Yearly" : "Monthly"})</CardTitle>
+            <CardTitle>{t('comparisonSalary', { period: isYearly ? t('yearly') : t('monthly') })}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -199,18 +213,18 @@ const Index = () => {
           </CardContent>
         </Card>
 
-        {taxBreakdown && renderTaxBreakdown(taxBreakdown, "Tax Breakdown")}
-        {comparisonTaxBreakdown && renderTaxBreakdown(comparisonTaxBreakdown, "Comparison Tax Breakdown")}
+        {taxBreakdown && renderTaxBreakdown(taxBreakdown, 'taxBreakdown')}
+        {comparisonTaxBreakdown && renderTaxBreakdown(comparisonTaxBreakdown, 'comparisonTaxBreakdown')}
       </div>
 
       <Card className="mt-6">
         <CardHeader>
           <CardTitle className="flex justify-between items-center">
-            <span>Swedish Tax Rates ({isTableYearly ? "Yearly" : "Monthly"})</span>
+            <span>{t('swedishTaxRates', { period: isTableYearly ? t('yearly') : t('monthly') })}</span>
             <div className="flex items-center space-x-2">
               <Switch id="table-period-toggle" checked={isTableYearly} onCheckedChange={toggleTablePeriod} />
               <Label htmlFor="table-period-toggle" className="text-sm">
-                {isTableYearly ? "Yearly" : "Monthly"}
+                {isTableYearly ? t('yearly') : t('monthly')}
               </Label>
             </div>
           </CardTitle>
@@ -219,8 +233,8 @@ const Index = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Income (SEK)</TableHead>
-                <TableHead>Tax Rate</TableHead>
+                <TableHead>{t('income')}</TableHead>
+                <TableHead>{t('taxRate')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
