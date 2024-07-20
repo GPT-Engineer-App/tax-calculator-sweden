@@ -6,7 +6,7 @@ import { Slider } from "@/components/ui/slider";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const formatNumber = (number) => {
-  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  return Math.round(number).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 };
 
 const taxRates = [
@@ -78,9 +78,9 @@ const Index = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  <p><strong>Net Salary:</strong> {formatNumber(netSalary.toFixed(2))} SEK</p>
+                  <p><strong>Net Salary:</strong> {formatNumber(netSalary)} SEK</p>
                   <p><strong>Tax Percentage:</strong> {taxPercentage.toFixed(2)}%</p>
-                  <p><strong>Total Employer Cost:</strong> {formatNumber(employerCost.toFixed(2))} SEK</p>
+                  <p><strong>Total Employer Cost:</strong> {formatNumber(employerCost)} SEK</p>
                 </div>
               </CardContent>
             </Card>
