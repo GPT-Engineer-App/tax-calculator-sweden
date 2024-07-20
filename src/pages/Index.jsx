@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const formatNumber = (number) => {
   return Math.round(number).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
@@ -24,6 +25,8 @@ const taxRates = [
 ];
 
 const SOCIAL_SECURITY_PERCENTAGE = 31.42;
+const DIVIDEND_TAX_RATE = 0.30;
+const CAPITAL_GAINS_TAX_RATE = 0.30;
 
 const calculateTax = (salary, isYearly) => {
   const yearlySalary = isYearly ? salary : salary * 12;
@@ -59,6 +62,8 @@ const Index = () => {
   const [comparisonTaxBreakdown, setComparisonTaxBreakdown] = useState(null);
   const [isYearly, setIsYearly] = useState(false);
   const [isTableYearly, setIsTableYearly] = useState(true);
+  const [dividends, setDividends] = useState(0);
+  const [capitalGains, setCapitalGains] = useState(0);
 
   const handleSliderChange = (value) => {
     setSalary(value[0]);
@@ -82,6 +87,20 @@ const Index = () => {
     }
   };
 
+  const handleDividendsChange = (event) => {
+    const value = parseFormattedNumber(event.target.value);
+    if (!isNaN(value)) {
+      setDividends(value);
+    }
+  };
+
+  const handleCapitalGainsChange = (event) => {
+    const value = parseFormattedNumber(event.target.value);
+    if (!isNaN(value)) {
+      setCapitalGains(value);
+    }
+  };
+
   const calculateBreakdown = (currentSalary, setBreakdownState) => {
     const taxResult = calculateTax(currentSalary, isYearly);
     const grossSalary = isYearly ? currentSalary : currentSalary * 12;
@@ -89,11 +108,16 @@ const Index = () => {
     const taxPercentage = (taxResult.totalTax / grossSalary) * 100;
     const employerCost = grossSalary + taxResult.socialSecurity;
 
+    const dividendTax = dividends * DIVIDEND_TAX_RATE;
+    const capitalGainsTax = capitalGains * CAPITAL_GAINS_TAX_RATE;
+
     setBreakdownState({
       grossSalary,
       netSalary,
       taxPercentage,
       employerCost,
+      dividendTax,
+      capitalGainsTax,
       ...taxResult,
     });
   };
@@ -101,7 +125,7 @@ const Index = () => {
   useEffect(() => {
     calculateBreakdown(salary, setTaxBreakdown);
     calculateBreakdown(comparisonSalary, setComparisonTaxBreakdown);
-  }, [salary, comparisonSalary, isYearly]);
+  }, [salary, comparisonSalary, isYearly, dividends, capitalGains]);
 
   const togglePeriod = () => {
     setIsYearly(!isYearly);
@@ -132,6 +156,14 @@ const Index = () => {
             <TableRow>
               <TableCell>{t('pensionContribution')}</TableCell>
               <TableCell className="text-right">-{formatNumber(isYearly ? breakdown.pensionContribution : breakdown.pensionContribution / 12)} SEK</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>{t('dividendTax')}</TableCell>
+              <TableCell className="text-right">-{formatNumber(breakdown.dividendTax)} SEK</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>{t('capitalGainsTax')}</TableCell>
+              <TableCell className="text-right">-{formatNumber(breakdown.capitalGainsTax)} SEK</TableCell>
             </TableRow>
             <TableRow className="font-bold">
               <TableCell>{t('netSalary')}</TableCell>
@@ -176,61 +208,108 @@ const Index = () => {
           </SelectContent>
         </Select>
       </div>
+      <Tabs defaultValue="income" className="mb-6">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="income">{t('income')}</TabsTrigger>
+          <TabsTrigger value="investments">{t('investments')}</TabsTrigger>
+        </TabsList>
+        <TabsContent value="income">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle className="flex justify-between items-center">
+                  <span>{t('enterSalary', { period: isYearly ? t('yearly') : t('monthly') })}</span>
+                  <div className="flex items-center space-x-2">
+                    <Switch id="period-toggle" checked={isYearly} onCheckedChange={togglePeriod} />
+                    <Label htmlFor="period-toggle" className="text-sm">
+                      {isYearly ? t('yearly') : t('monthly')}
+                    </Label>
+                  </div>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <Slider
+                    value={[salary]}
+                    onValueChange={handleSliderChange}
+                    max={isYearly ? 1200000 : 100000}
+                    step={isYearly ? 12000 : 1000}
+                    className="mb-4"
+                  />
+                  <Input
+                    type="text"
+                    value={formatNumber(salary)}
+                    onChange={handleSalaryInputChange}
+                    className="text-right"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle>{t('comparisonSalary', { period: isYearly ? t('yearly') : t('monthly') })}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <Slider
+                    value={[comparisonSalary]}
+                    onValueChange={handleComparisonSliderChange}
+                    max={isYearly ? 1200000 : 100000}
+                    step={isYearly ? 12000 : 1000}
+                    className="mb-4"
+                  />
+                  <Input
+                    type="text"
+                    value={formatNumber(comparisonSalary)}
+                    onChange={handleComparisonSalaryInputChange}
+                    className="text-right"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+        <TabsContent value="investments">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle>{t('dividends')}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <Input
+                    type="text"
+                    value={formatNumber(dividends)}
+                    onChange={handleDividendsChange}
+                    className="text-right"
+                  />
+                  <p>{t('dividendTaxRate')}: {DIVIDEND_TAX_RATE * 100}%</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle>{t('capitalGains')}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <Input
+                    type="text"
+                    value={formatNumber(capitalGains)}
+                    onChange={handleCapitalGainsChange}
+                    className="text-right"
+                  />
+                  <p>{t('capitalGainsTaxRate')}: {CAPITAL_GAINS_TAX_RATE * 100}%</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+      </Tabs>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex justify-between items-center">
-              <span>{t('enterSalary', { period: isYearly ? t('yearly') : t('monthly') })}</span>
-              <div className="flex items-center space-x-2">
-                <Switch id="period-toggle" checked={isYearly} onCheckedChange={togglePeriod} />
-                <Label htmlFor="period-toggle" className="text-sm">
-                  {isYearly ? t('yearly') : t('monthly')}
-                </Label>
-              </div>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <Slider
-                value={[salary]}
-                onValueChange={handleSliderChange}
-                max={isYearly ? 1200000 : 100000}
-                step={isYearly ? 12000 : 1000}
-                className="mb-4"
-              />
-              <Input
-                type="text"
-                value={formatNumber(salary)}
-                onChange={handleSalaryInputChange}
-                className="text-right"
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>{t('comparisonSalary', { period: isYearly ? t('yearly') : t('monthly') })}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <Slider
-                value={[comparisonSalary]}
-                onValueChange={handleComparisonSliderChange}
-                max={isYearly ? 1200000 : 100000}
-                step={isYearly ? 12000 : 1000}
-                className="mb-4"
-              />
-              <Input
-                type="text"
-                value={formatNumber(comparisonSalary)}
-                onChange={handleComparisonSalaryInputChange}
-                className="text-right"
-              />
-            </div>
-          </CardContent>
-        </Card>
-
         {taxBreakdown && renderTaxBreakdown(taxBreakdown, 'taxBreakdown')}
         {comparisonTaxBreakdown && renderTaxBreakdown(comparisonTaxBreakdown, 'comparisonTaxBreakdown')}
       </div>
