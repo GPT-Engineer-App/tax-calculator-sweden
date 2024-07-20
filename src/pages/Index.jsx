@@ -12,9 +12,9 @@ const formatNumber = (number) => {
 };
 
 const taxRates = [
-  { income: "0 - 540,700", rate: "32%" },
-  { income: "540,701 - 709,300", rate: "52%" },
-  { income: "709,301+", rate: "57%" },
+  { yearlyIncome: "0 - 540,700", monthlyIncome: "0 - 45,058", rate: "32%" },
+  { yearlyIncome: "540,701 - 709,300", monthlyIncome: "45,059 - 59,108", rate: "52%" },
+  { yearlyIncome: "709,301+", monthlyIncome: "59,109+", rate: "57%" },
 ];
 
 const Index = () => {
@@ -23,6 +23,7 @@ const Index = () => {
   const [taxPercentage, setTaxPercentage] = useState(null);
   const [employerCost, setEmployerCost] = useState(null);
   const [isYearly, setIsYearly] = useState(false);
+  const [isTableYearly, setIsTableYearly] = useState(true);
 
   const handleSliderChange = (value) => {
     setSalary(value[0]);
@@ -48,6 +49,10 @@ const Index = () => {
   const togglePeriod = () => {
     setIsYearly(!isYearly);
     setSalary(isYearly ? salary / 12 : salary * 12);
+  };
+
+  const toggleTablePeriod = () => {
+    setIsTableYearly(!isTableYearly);
   };
 
   return (
@@ -103,7 +108,15 @@ const Index = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Swedish Tax Rates (Yearly)</CardTitle>
+            <CardTitle className="flex justify-between items-center">
+              <span>Swedish Tax Rates ({isTableYearly ? "Yearly" : "Monthly"})</span>
+              <div className="flex items-center space-x-2">
+                <Switch id="table-period-toggle" checked={isTableYearly} onCheckedChange={toggleTablePeriod} />
+                <Label htmlFor="table-period-toggle" className="text-sm">
+                  {isTableYearly ? "Yearly" : "Monthly"}
+                </Label>
+              </div>
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
@@ -116,7 +129,7 @@ const Index = () => {
               <TableBody>
                 {taxRates.map((rate, index) => (
                   <TableRow key={index}>
-                    <TableCell>{rate.income}</TableCell>
+                    <TableCell>{isTableYearly ? rate.yearlyIncome : rate.monthlyIncome}</TableCell>
                     <TableCell>{rate.rate}</TableCell>
                   </TableRow>
                 ))}
