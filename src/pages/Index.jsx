@@ -67,6 +67,24 @@ const stockholmTaxTable = [
   { grossSalary: 50000, withholding: 15309, percentage: 30.62, netSalary: 34691, socialTax: 15710, totalCost: 65710 },
   { grossSalary: 55000, withholding: 18047, percentage: 32.81, netSalary: 36953, socialTax: 17281, totalCost: 72281 },
   { grossSalary: 60000, withholding: 20947, percentage: 34.91, netSalary: 39053, socialTax: 18852, totalCost: 78852 },
+  { grossSalary: 65000, withholding: 23847, percentage: 36.69, netSalary: 41153, socialTax: 20423, totalCost: 85423 },
+  { grossSalary: 70000, withholding: 26747, percentage: 38.21, netSalary: 43253, socialTax: 21994, totalCost: 91994 },
+  { grossSalary: 75000, withholding: 29647, percentage: 39.53, netSalary: 45353, socialTax: 23565, totalCost: 98565 },
+  { grossSalary: 80000, withholding: 32547, percentage: 40.68, netSalary: 47453, socialTax: 25136, totalCost: 105136 },
+  { grossSalary: 85000, withholding: 35447, percentage: 41.70, netSalary: 49553, socialTax: 26707, totalCost: 111707 },
+  { grossSalary: 90000, withholding: 38347, percentage: 42.61, netSalary: 51653, socialTax: 28278, totalCost: 118278 },
+  { grossSalary: 95000, withholding: 41247, percentage: 43.42, netSalary: 53753, socialTax: 29849, totalCost: 124849 },
+  { grossSalary: 100000, withholding: 44147, percentage: 44.15, netSalary: 55853, socialTax: 31420, totalCost: 131420 },
+  { grossSalary: 105000, withholding: 47047, percentage: 44.81, netSalary: 57953, socialTax: 32991, totalCost: 137991 },
+  { grossSalary: 110000, withholding: 49947, percentage: 45.41, netSalary: 60053, socialTax: 34562, totalCost: 144562 },
+  { grossSalary: 115000, withholding: 52847, percentage: 45.95, netSalary: 62153, socialTax: 36133, totalCost: 151133 },
+  { grossSalary: 120000, withholding: 55747, percentage: 46.46, netSalary: 64253, socialTax: 37704, totalCost: 157704 },
+  { grossSalary: 125000, withholding: 58647, percentage: 46.92, netSalary: 66353, socialTax: 39275, totalCost: 164275 },
+  { grossSalary: 130000, withholding: 61547, percentage: 47.34, netSalary: 68453, socialTax: 40846, totalCost: 170846 },
+  { grossSalary: 135000, withholding: 64447, percentage: 47.74, netSalary: 70553, socialTax: 42417, totalCost: 177417 },
+  { grossSalary: 140000, withholding: 67347, percentage: 48.11, netSalary: 72653, socialTax: 43988, totalCost: 183988 },
+  { grossSalary: 145000, withholding: 70247, percentage: 48.45, netSalary: 74753, socialTax: 45559, totalCost: 190559 },
+  { grossSalary: 150000, withholding: 73147, percentage: 48.76, netSalary: 76853, socialTax: 47130, totalCost: 197130 },
 ];
 
 const Index = () => {
@@ -386,7 +404,7 @@ const Index = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>{t('grossSalary')} (SEK)</TableHead>
-                  <TableHead>{t('incomeTax')}</TableHead>
+                  <TableHead>{t('incomeTax')} (SEK)</TableHead>
                   <TableHead>{t('taxPercentage')}</TableHead>
                   <TableHead>{t('netSalary')} (SEK)</TableHead>
                   <TableHead>{t('employerSocialSecurity')} (SEK)</TableHead>
