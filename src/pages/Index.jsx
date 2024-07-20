@@ -97,145 +97,143 @@ const Index = () => {
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold text-center mb-6">Swedish Tax Calculator</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <Card className="mb-6">
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex justify-between items-center">
+              <span>Enter Your {isYearly ? "Yearly" : "Monthly"} Salary</span>
+              <div className="flex items-center space-x-2">
+                <Switch id="period-toggle" checked={isYearly} onCheckedChange={togglePeriod} />
+                <Label htmlFor="period-toggle" className="text-sm">
+                  {isYearly ? "Yearly" : "Monthly"}
+                </Label>
+              </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <Slider
+                value={[salary]}
+                onValueChange={handleSliderChange}
+                max={isYearly ? 1200000 : 100000}
+                step={isYearly ? 12000 : 1000}
+                className="mb-4"
+              />
+              <Input
+                type="text"
+                value={formatNumber(salary)}
+                readOnly
+                className="text-right"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Comparison Salary ({isYearly ? "Yearly" : "Monthly"})</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <Slider
+                value={[comparisonSalary]}
+                onValueChange={handleComparisonSliderChange}
+                max={isYearly ? 1200000 : 100000}
+                step={isYearly ? 12000 : 1000}
+                className="mb-4"
+              />
+              <Input
+                type="text"
+                value={formatNumber(comparisonSalary)}
+                readOnly
+                className="text-right"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {taxBreakdown && (
+          <Card>
             <CardHeader>
-              <CardTitle>Enter Your {isYearly ? "Yearly" : "Monthly"} Salary</CardTitle>
+              <CardTitle>Tax Breakdown ({isYearly ? "Yearly" : "Monthly"})</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center space-x-2">
-                  <Switch id="period-toggle" checked={isYearly} onCheckedChange={togglePeriod} />
-                  <Label htmlFor="period-toggle">
-                    {isYearly ? "Yearly" : "Monthly"}
-                  </Label>
-                </div>
-                <Slider
-                  value={[salary]}
-                  onValueChange={handleSliderChange}
-                  max={isYearly ? 1200000 : 100000}
-                  step={isYearly ? 12000 : 1000}
-                  className="mb-4"
-                />
-                <Input
-                  type="text"
-                  value={formatNumber(salary)}
-                  readOnly
-                  className="text-right"
-                />
-              </div>
+              <Table>
+                <TableBody>
+                  <TableRow>
+                    <TableCell>Gross Salary</TableCell>
+                    <TableCell className="text-right">{formatNumber(isYearly ? taxBreakdown.grossSalary : taxBreakdown.grossSalary / 12)} SEK</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Income Tax</TableCell>
+                    <TableCell className="text-right">-{formatNumber(isYearly ? taxBreakdown.incomeTax : taxBreakdown.incomeTax / 12)} SEK</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Pension Contribution</TableCell>
+                    <TableCell className="text-right">-{formatNumber(isYearly ? taxBreakdown.pensionContribution : taxBreakdown.pensionContribution / 12)} SEK</TableCell>
+                  </TableRow>
+                  <TableRow className="font-bold">
+                    <TableCell>Net Salary</TableCell>
+                    <TableCell className="text-right">{formatNumber(isYearly ? taxBreakdown.netSalary : taxBreakdown.netSalary / 12)} SEK</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Tax Percentage</TableCell>
+                    <TableCell className="text-right">{taxBreakdown.taxPercentage.toFixed(2)}%</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Employer's Social Security Contribution</TableCell>
+                    <TableCell className="text-right">{formatNumber(isYearly ? taxBreakdown.socialSecurity : taxBreakdown.socialSecurity / 12)} SEK</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Total Employer Cost</TableCell>
+                    <TableCell className="text-right">{formatNumber(isYearly ? taxBreakdown.employerCost : taxBreakdown.employerCost / 12)} SEK</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
             </CardContent>
           </Card>
+        )}
 
-          {taxBreakdown && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Tax Breakdown ({isYearly ? "Yearly" : "Monthly"})</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell>Gross Salary</TableCell>
-                      <TableCell className="text-right">{formatNumber(isYearly ? taxBreakdown.grossSalary : taxBreakdown.grossSalary / 12)} SEK</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>Income Tax</TableCell>
-                      <TableCell className="text-right">-{formatNumber(isYearly ? taxBreakdown.incomeTax : taxBreakdown.incomeTax / 12)} SEK</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>Pension Contribution</TableCell>
-                      <TableCell className="text-right">-{formatNumber(isYearly ? taxBreakdown.pensionContribution : taxBreakdown.pensionContribution / 12)} SEK</TableCell>
-                    </TableRow>
-                    <TableRow className="font-bold">
-                      <TableCell>Net Salary</TableCell>
-                      <TableCell className="text-right">{formatNumber(isYearly ? taxBreakdown.netSalary : taxBreakdown.netSalary / 12)} SEK</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>Tax Percentage</TableCell>
-                      <TableCell className="text-right">{taxBreakdown.taxPercentage.toFixed(2)}%</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>Employer's Social Security Contribution</TableCell>
-                      <TableCell className="text-right">{formatNumber(isYearly ? taxBreakdown.socialSecurity : taxBreakdown.socialSecurity / 12)} SEK</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>Total Employer Cost</TableCell>
-                      <TableCell className="text-right">{formatNumber(isYearly ? taxBreakdown.employerCost : taxBreakdown.employerCost / 12)} SEK</TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-
-        <div>
-          <Card className="mb-6">
+        {comparisonTaxBreakdown && (
+          <Card>
             <CardHeader>
-              <CardTitle>Comparison Salary ({isYearly ? "Yearly" : "Monthly"})</CardTitle>
+              <CardTitle>Comparison Tax Breakdown ({isYearly ? "Yearly" : "Monthly"})</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <Slider
-                  value={[comparisonSalary]}
-                  onValueChange={handleComparisonSliderChange}
-                  max={isYearly ? 1200000 : 100000}
-                  step={isYearly ? 12000 : 1000}
-                  className="mb-4"
-                />
-                <Input
-                  type="text"
-                  value={formatNumber(comparisonSalary)}
-                  readOnly
-                  className="text-right"
-                />
-              </div>
+              <Table>
+                <TableBody>
+                  <TableRow>
+                    <TableCell>Gross Salary</TableCell>
+                    <TableCell className="text-right">{formatNumber(isYearly ? comparisonTaxBreakdown.grossSalary : comparisonTaxBreakdown.grossSalary / 12)} SEK</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Income Tax</TableCell>
+                    <TableCell className="text-right">-{formatNumber(isYearly ? comparisonTaxBreakdown.incomeTax : comparisonTaxBreakdown.incomeTax / 12)} SEK</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Pension Contribution</TableCell>
+                    <TableCell className="text-right">-{formatNumber(isYearly ? comparisonTaxBreakdown.pensionContribution : comparisonTaxBreakdown.pensionContribution / 12)} SEK</TableCell>
+                  </TableRow>
+                  <TableRow className="font-bold">
+                    <TableCell>Net Salary</TableCell>
+                    <TableCell className="text-right">{formatNumber(isYearly ? comparisonTaxBreakdown.netSalary : comparisonTaxBreakdown.netSalary / 12)} SEK</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Tax Percentage</TableCell>
+                    <TableCell className="text-right">{comparisonTaxBreakdown.taxPercentage.toFixed(2)}%</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Employer's Social Security Contribution</TableCell>
+                    <TableCell className="text-right">{formatNumber(isYearly ? comparisonTaxBreakdown.socialSecurity : comparisonTaxBreakdown.socialSecurity / 12)} SEK</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Total Employer Cost</TableCell>
+                    <TableCell className="text-right">{formatNumber(isYearly ? comparisonTaxBreakdown.employerCost : comparisonTaxBreakdown.employerCost / 12)} SEK</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
             </CardContent>
           </Card>
-
-          {comparisonTaxBreakdown && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Comparison Tax Breakdown ({isYearly ? "Yearly" : "Monthly"})</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell>Gross Salary</TableCell>
-                      <TableCell className="text-right">{formatNumber(isYearly ? comparisonTaxBreakdown.grossSalary : comparisonTaxBreakdown.grossSalary / 12)} SEK</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>Income Tax</TableCell>
-                      <TableCell className="text-right">-{formatNumber(isYearly ? comparisonTaxBreakdown.incomeTax : comparisonTaxBreakdown.incomeTax / 12)} SEK</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>Pension Contribution</TableCell>
-                      <TableCell className="text-right">-{formatNumber(isYearly ? comparisonTaxBreakdown.pensionContribution : comparisonTaxBreakdown.pensionContribution / 12)} SEK</TableCell>
-                    </TableRow>
-                    <TableRow className="font-bold">
-                      <TableCell>Net Salary</TableCell>
-                      <TableCell className="text-right">{formatNumber(isYearly ? comparisonTaxBreakdown.netSalary : comparisonTaxBreakdown.netSalary / 12)} SEK</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>Tax Percentage</TableCell>
-                      <TableCell className="text-right">{comparisonTaxBreakdown.taxPercentage.toFixed(2)}%</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>Employer's Social Security Contribution</TableCell>
-                      <TableCell className="text-right">{formatNumber(isYearly ? comparisonTaxBreakdown.socialSecurity : comparisonTaxBreakdown.socialSecurity / 12)} SEK</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>Total Employer Cost</TableCell>
-                      <TableCell className="text-right">{formatNumber(isYearly ? comparisonTaxBreakdown.employerCost : comparisonTaxBreakdown.employerCost / 12)} SEK</TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          )}
-        </div>
+        )}
       </div>
 
       <Card className="mt-6">
