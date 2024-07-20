@@ -1,16 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const Index = () => {
   const [monthlySalary, setMonthlySalary] = useState("");
+  const [formattedSalary, setFormattedSalary] = useState("");
   const [netSalary, setNetSalary] = useState(null);
   const [taxPercentage, setTaxPercentage] = useState(null);
   const [employerCost, setEmployerCost] = useState(null);
 
+  useEffect(() => {
+    // Format the salary with spaces every three digits
+    const formatted = monthlySalary.replace(/\s/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    setFormattedSalary(formatted);
+  }, [monthlySalary]);
+
+  const handleInputChange = (e) => {
+    const value = e.target.value.replace(/\s/g, '');
+    if (/^\d*$/.test(value)) {
+      setMonthlySalary(value);
+    }
+  };
+
   const handleCalculate = () => {
-    // Placeholder calculation logic - to be replaced with actual Swedish tax calculation
     const salary = parseFloat(monthlySalary);
     if (isNaN(salary)) return;
 
@@ -33,10 +46,11 @@ const Index = () => {
         <CardContent>
           <div className="space-y-4">
             <Input
-              type="number"
+              type="text"
               placeholder="Monthly Salary (SEK)"
-              value={monthlySalary}
-              onChange={(e) => setMonthlySalary(e.target.value)}
+              value={formattedSalary}
+              onChange={handleInputChange}
+              className="text-right"
             />
             <Button onClick={handleCalculate} className="w-full">Calculate</Button>
           </div>
