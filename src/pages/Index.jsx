@@ -13,6 +13,10 @@ const formatNumber = (number) => {
   return Math.round(number).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 };
 
+const parseFormattedNumber = (formattedNumber) => {
+  return parseInt(formattedNumber.replace(/\s/g, ""), 10);
+};
+
 const taxRates = [
   { yearlyIncome: "0 - 540,700", monthlyIncome: "0 - 45,058", rate: "32%" },
   { yearlyIncome: "540,701 - 709,300", monthlyIncome: "45,059 - 59,108", rate: "52%" },
@@ -62,6 +66,20 @@ const Index = () => {
 
   const handleComparisonSliderChange = (value) => {
     setComparisonSalary(value[0]);
+  };
+
+  const handleSalaryInputChange = (event) => {
+    const value = parseFormattedNumber(event.target.value);
+    if (!isNaN(value)) {
+      setSalary(value);
+    }
+  };
+
+  const handleComparisonSalaryInputChange = (event) => {
+    const value = parseFormattedNumber(event.target.value);
+    if (!isNaN(value)) {
+      setComparisonSalary(value);
+    }
   };
 
   const calculateBreakdown = (currentSalary, setBreakdownState) => {
@@ -183,7 +201,7 @@ const Index = () => {
               <Input
                 type="text"
                 value={formatNumber(salary)}
-                readOnly
+                onChange={handleSalaryInputChange}
                 className="text-right"
               />
             </div>
@@ -206,7 +224,7 @@ const Index = () => {
               <Input
                 type="text"
                 value={formatNumber(comparisonSalary)}
-                readOnly
+                onChange={handleComparisonSalaryInputChange}
                 className="text-right"
               />
             </div>
