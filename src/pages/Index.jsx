@@ -74,7 +74,7 @@ const calculateTaxFromTable = (salary, isYearly) => {
   const taxPercentage = closestSalary.percentage / 100;
   const monthlyTax = monthlySalary * taxPercentage;
   const monthlyNetSalary = monthlySalary - monthlyTax;
-  const monthlySocialTax = closestSalary.socialTax * (monthlySalary / closestSalary.grossSalary);
+  const monthlySocialTax = monthlySalary * (SOCIAL_SECURITY_PERCENTAGE / 100);
   const monthlyTotalCost = monthlySalary + monthlySocialTax;
 
   // Convert to yearly if needed
