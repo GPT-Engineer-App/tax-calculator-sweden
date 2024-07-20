@@ -64,6 +64,7 @@ const Index = () => {
   const [isTableYearly, setIsTableYearly] = useState(true);
   const [dividends, setDividends] = useState(0);
   const [capitalGains, setCapitalGains] = useState(0);
+  const [activeTab, setActiveTab] = useState("income");
 
   const handleSliderChange = (value) => {
     setSalary(value[0]);
@@ -145,46 +146,58 @@ const Index = () => {
       <CardContent>
         <Table>
           <TableBody>
-            <TableRow>
-              <TableCell>{t('grossSalary')}</TableCell>
-              <TableCell className="text-right">{formatNumber(isYearly ? breakdown.grossSalary : breakdown.grossSalary / 12)} SEK</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>{t('incomeTax')}</TableCell>
-              <TableCell className="text-right">-{formatNumber(isYearly ? breakdown.incomeTax : breakdown.incomeTax / 12)} SEK</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>{t('pensionContribution')}</TableCell>
-              <TableCell className="text-right">-{formatNumber(isYearly ? breakdown.pensionContribution : breakdown.pensionContribution / 12)} SEK</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>{t('dividendTax')}</TableCell>
-              <TableCell className="text-right">-{formatNumber(breakdown.dividendTax)} SEK</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>{t('capitalGainsTax')}</TableCell>
-              <TableCell className="text-right">-{formatNumber(breakdown.capitalGainsTax)} SEK</TableCell>
-            </TableRow>
-            <TableRow className="font-bold">
-              <TableCell>{t('netSalary')}</TableCell>
-              <TableCell className="text-right">{formatNumber(isYearly ? breakdown.netSalary : breakdown.netSalary / 12)} SEK</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>{t('taxPercentage')}</TableCell>
-              <TableCell className="text-right">{breakdown.taxPercentage.toFixed(2)}%</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>{t('employerSocialSecurity')}</TableCell>
-              <TableCell className="text-right">{formatNumber(isYearly ? breakdown.socialSecurity : breakdown.socialSecurity / 12)} SEK</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>{t('socialSecurityPercentage')}</TableCell>
-              <TableCell className="text-right">{SOCIAL_SECURITY_PERCENTAGE.toFixed(2)}%</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>{t('totalEmployerCost')}</TableCell>
-              <TableCell className="text-right">{formatNumber(isYearly ? breakdown.employerCost : breakdown.employerCost / 12)} SEK</TableCell>
-            </TableRow>
+            {activeTab === "income" && (
+              <>
+                <TableRow>
+                  <TableCell>{t('grossSalary')}</TableCell>
+                  <TableCell className="text-right">{formatNumber(isYearly ? breakdown.grossSalary : breakdown.grossSalary / 12)} SEK</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>{t('incomeTax')}</TableCell>
+                  <TableCell className="text-right">-{formatNumber(isYearly ? breakdown.incomeTax : breakdown.incomeTax / 12)} SEK</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>{t('pensionContribution')}</TableCell>
+                  <TableCell className="text-right">-{formatNumber(isYearly ? breakdown.pensionContribution : breakdown.pensionContribution / 12)} SEK</TableCell>
+                </TableRow>
+              </>
+            )}
+            {activeTab === "investments" && (
+              <>
+                <TableRow>
+                  <TableCell>{t('dividendTax')}</TableCell>
+                  <TableCell className="text-right">-{formatNumber(breakdown.dividendTax)} SEK</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>{t('capitalGainsTax')}</TableCell>
+                  <TableCell className="text-right">-{formatNumber(breakdown.capitalGainsTax)} SEK</TableCell>
+                </TableRow>
+              </>
+            )}
+            {activeTab === "income" && (
+              <>
+                <TableRow className="font-bold">
+                  <TableCell>{t('netSalary')}</TableCell>
+                  <TableCell className="text-right">{formatNumber(isYearly ? breakdown.netSalary : breakdown.netSalary / 12)} SEK</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>{t('taxPercentage')}</TableCell>
+                  <TableCell className="text-right">{breakdown.taxPercentage.toFixed(2)}%</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>{t('employerSocialSecurity')}</TableCell>
+                  <TableCell className="text-right">{formatNumber(isYearly ? breakdown.socialSecurity : breakdown.socialSecurity / 12)} SEK</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>{t('socialSecurityPercentage')}</TableCell>
+                  <TableCell className="text-right">{SOCIAL_SECURITY_PERCENTAGE.toFixed(2)}%</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>{t('totalEmployerCost')}</TableCell>
+                  <TableCell className="text-right">{formatNumber(isYearly ? breakdown.employerCost : breakdown.employerCost / 12)} SEK</TableCell>
+                </TableRow>
+              </>
+            )}
           </TableBody>
         </Table>
       </CardContent>
@@ -208,7 +221,7 @@ const Index = () => {
           </SelectContent>
         </Select>
       </div>
-      <Tabs defaultValue="income" className="mb-6">
+      <Tabs defaultValue="income" className="mb-6" onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="income">{t('income')}</TabsTrigger>
           <TabsTrigger value="investments">{t('investments')}</TabsTrigger>
@@ -314,37 +327,39 @@ const Index = () => {
         {comparisonTaxBreakdown && renderTaxBreakdown(comparisonTaxBreakdown, 'comparisonTaxBreakdown')}
       </div>
 
-      <Card className="mt-6">
-        <CardHeader>
-          <CardTitle className="flex justify-between items-center">
-            <span>{t('swedishTaxRates', { period: isTableYearly ? t('yearly') : t('monthly') })}</span>
-            <div className="flex items-center space-x-2">
-              <Switch id="table-period-toggle" checked={isTableYearly} onCheckedChange={toggleTablePeriod} />
-              <Label htmlFor="table-period-toggle" className="text-sm">
-                {isTableYearly ? t('yearly') : t('monthly')}
-              </Label>
-            </div>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t('income')}</TableHead>
-                <TableHead>{t('taxRate')}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {taxRates.map((rate, index) => (
-                <TableRow key={index}>
-                  <TableCell>{isTableYearly ? rate.yearlyIncome : rate.monthlyIncome}</TableCell>
-                  <TableCell>{rate.rate}</TableCell>
+      {activeTab === "income" && (
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle className="flex justify-between items-center">
+              <span>{t('swedishTaxRates', { period: isTableYearly ? t('yearly') : t('monthly') })}</span>
+              <div className="flex items-center space-x-2">
+                <Switch id="table-period-toggle" checked={isTableYearly} onCheckedChange={toggleTablePeriod} />
+                <Label htmlFor="table-period-toggle" className="text-sm">
+                  {isTableYearly ? t('yearly') : t('monthly')}
+                </Label>
+              </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t('income')}</TableHead>
+                  <TableHead>{t('taxRate')}</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+              </TableHeader>
+              <TableBody>
+                {taxRates.map((rate, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{isTableYearly ? rate.yearlyIncome : rate.monthlyIncome}</TableCell>
+                    <TableCell>{rate.rate}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
